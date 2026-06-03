@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adiviná la canción mundialista | Ubiar 2026</title>
+  <style>
+    :root{
+      --bg:#07132d;
+      --card:#101f44;
+      --card2:#162b5c;
+      --accent:#00d1ff;
+      --accent2:#ffcc00;
+      --good:#16d47b;
+      --bad:#ff5b6e;
+      --text:#ffffff;
+      --muted:#b7c2d8;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      background: radial-gradient(circle at top left, #173b82 0, var(--bg) 45%, #030713 100%);
+      color:var(--text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display:flex;
+      justify-content:center;
+      padding:18px;
+    }
+    .app{width:min(980px,100%)}
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      margin-bottom:16px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .logo{
+      width:46px;height:46px;border-radius:14px;
+      background:linear-gradient(135deg,var(--accent),#5a72ff);
+      display:grid;place-items:center;
+      font-weight:900;color:#00102b;letter-spacing:-1px;
+      box-shadow:0 10px 30px rgba(0,209,255,.22);
+    }
+    h1{font-size:clamp(24px,4vw,42px);line-height:1;margin:0}
+    .subtitle{color:var(--muted);margin-top:6px;font-size:14px}
+    .pill{
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.15);
+      padding:8px 12px;border-radius:999px;color:var(--muted);font-size:13px;
+      white-space:nowrap;
+    }
+    .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+    @media (max-width:760px){.grid{grid-template-columns:1fr} header{align-items:flex-start}.pill{display:none}}
+    .card{
+      background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.035));
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:24px;
+      padding:18px;
+      box-shadow:0 18px 50px rgba(0,0,0,.22);
+      backdrop-filter:blur(8px);
+    }
+    .round{color:var(--accent2);font-weight:800;text-transform:uppercase;font-size:13px;letter-spacing:.12em}
+    .question{font-size:clamp(22px,4.8vw,44px);font-weight:900;margin:8px 0 12px;line-height:1.05}
+    .hint{color:var(--muted);font-size:15px;margin-bottom:14px}
+    .spotifyBox{border-radius:14px;overflow:hidden;background:#000;margin:14px 0}
+    iframe{display:block;border:0;width:100%;height:152px}
+    .controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+    @media (max-width:500px){.controls{grid-template-columns:1fr}}
+    button{
+      border:0;border-radius:16px;padding:14px 16px;font-weight:800;font-size:15px;
+      cursor:pointer;color:#061127;background:#fff;transition:.18s transform,.18s filter;
+    }
+    button:active{transform:scale(.98)}
+    .primary{background:linear-gradient(135deg,var(--accent),#7cf3ff)}
+    .secondary{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.18)}
+    .gold{background:linear-gradient(135deg,var(--accent2),#fff09a)}
+    .danger{background:linear-gradient(135deg,var(--bad),#ff9aaa);color:#21020a}
+    .answer{
+      display:none;
+      margin-top:14px;
+      background:rgba(255,255,255,.09);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:18px;
+      padding:14px;
+    }
+    .answer.show{display:block}
+    .answer h2{margin:0 0 6px;font-size:22px}
+    .answer p{margin:4px 0;color:var(--muted)}
+    .scoreTitle{font-weight:900;font-size:20px;margin-bottom:10px}
+    .teams{display:grid;gap:10px}
+    .team{
+      background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.12);
+      border-radius:18px;padding:12px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;
+    }
+    .teamName{font-weight:900;font-size:18px}
+    .score{font-size:30px;font-weight:900;color:var(--accent2);min-width:42px;text-align:right}
+    .scoreBtns{grid-column:1/3;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+    .scoreBtns button{padding:10px 8px;border-radius:12px;font-size:13px}
+    .small{font-size:12px;color:var(--muted);line-height:1.4;margin-top:12px}
+    .setup{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+    @media (max-width:500px){.setup{grid-template-columns:1fr}}
+    input{
+      width:100%;padding:13px 14px;border-radius:14px;border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.08);color:white;font-weight:700;outline:none;
+    }
+    .progress{height:10px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden;margin-top:12px}
+    .bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:.25s width}
+    .rules{margin-top:14px;color:var(--muted);font-size:14px;line-height:1.45}
+    .rules b{color:#fff}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="brand">
+        <div class="logo">U</div>
+        <div>
+          <h1>Adiviná la canción</h1>
+          <div class="subtitle">Evento Integrador Ubiar 2026 · Especial Mundiales</div>
+        </div>
+      </div>
+      <div class="pill">Pensado para jugar desde el celu</div>
+    </header>
+
+    <section class="grid">
+      <div class="card">
+        <div class="round" id="roundLabel">Ronda 1</div>
+        <div class="question">¿A qué Mundial pertenece?</div>
+        <div class="hint">Reproducí el fragmento desde Spotify. El equipo que toque primero responde.</div>
+
+        <div class="spotifyBox" id="spotifyBox"></div>
+
+        <div class="controls">
+          <button class="primary" onclick="showAnswer()">Mostrar respuesta</button>
+          <button class="secondary" onclick="nextSong()">Siguiente canción</button>
+          <button class="gold" onclick="shuffleSongs()">Mezclar canciones</button>
+          <button class="danger" onclick="resetGame()">Reiniciar</button>
+        </div>
+
+        <div class="answer" id="answerBox">
+          <h2 id="songTitle"></h2>
+          <p id="artist"></p>
+          <p id="worldcup"></p>
+          <p id="pointsHelp"></p>
+        </div>
+        <div class="progress"><div class="bar" id="bar"></div></div>
+        <div class="rules">
+          <b>Puntaje sugerido:</b> canción + artista + mundial = 3 puntos. Si responde parcialmente, sumá 1 o 2 puntos según corresponda.
+        </div>
+      </div>
+
+      <aside class="card">
+        <div class="scoreTitle">Equipos</div>
+        <div class="setup">
+          <input id="teamInput" placeholder="Nombre del equipo" />
+          <button class="primary" onclick="addTeam()">Agregar</button>
+        </div>
+        <div class="teams" id="teams"></div>
+        <div class="small">
+          Tip: podés cambiar los equipos desde el código o agregarlos en vivo. Los puntos quedan guardados mientras no reinicies.
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    // Para sumar canciones: pegá el ID de Spotify Track.
+    // Ejemplo URL: https://open.spotify.com/track/2Cd9iWfcOpGDHLz6tVA3G4
+    // El ID es lo que aparece después de /track/
+    const songs = [
+      {
+        title: "La Copa de la Vida",
+        artist: "Ricky Martin",
+        worldcup: "Francia 1998",
+        spotifyId: "2Cd9iWfcOpGDHLz6tVA3G4"
+      },
+      {
+        title: "Waka Waka (This Time for Africa)",
+        artist: "Shakira ft. Freshlyground",
+        worldcup: "Sudáfrica 2010",
+        spotifyId: "6bNB5gxFX6Q87DbQWb8OWZ"
+      },
+      {
+        title: "Wavin' Flag",
+        artist: "K'NAAN",
+        worldcup: "Sudáfrica 2010",
+        spotifyId: "1nrJYpdAi7uosDRPmSYrsG"
+      },
+      {
+        title: "We Are One (Ole Ola)",
+        artist: "Pitbull, Jennifer Lopez & Claudia Leitte",
+        worldcup: "Brasil 2014",
+        spotifyId: "1PCvKFPWnTXAe2oaReVUcr"
+      },
+      {
+        title: "La La La (Brazil 2014)",
+        artist: "Shakira ft. Carlinhos Brown",
+        worldcup: "Brasil 2014",
+        spotifyId: "7wMq5n8mYSKlQIGECKUgTX"
+      },
+      {
+        title: "Colors",
+        artist: "Jason Derulo",
+        worldcup: "Rusia 2018",
+        spotifyId: "6Hgh47WXVKtXN5zGOu0hjI"
+      },
+      {
+        title: "Live It Up",
+        artist: "Nicky Jam, Will Smith & Era Istrefi",
+        worldcup: "Rusia 2018",
+        spotifyId: "0vW9E8M5YdTVCn5J2d8nK9"
+      },
+      {
+        title: "Hayya Hayya (Better Together)",
+        artist: "Trinidad Cardona, Davido & Aisha",
+        worldcup: "Qatar 2022",
+        spotifyId: "75FEaRjZTKLhTrFGsfMUXR"
+      },
+      {
+        title: "Dreamers",
+        artist: "Jung Kook & FIFA Sound",
+        worldcup: "Qatar 2022",
+        spotifyId: "1RDvyOk4WtPCtoqciJwVn8"
+      },
+      {
+        title: "Arhbo",
+        artist: "Ozuna, GIMS & RedOne",
+        worldcup: "Qatar 2022",
+        spotifyId: "7LxVX4Ywv3mRGcI2M3PHFj"
+      },
+      {
+        title: "Seven Nation Army",
+        artist: "The White Stripes",
+        worldcup: "Himno de cancha / Mundialista no oficial",
+        spotifyId: "3dPQuX8Gs42Y7b454ybpMR"
+      },
+      {
+        title: "Freed From Desire",
+        artist: "Gala",
+        worldcup: "Himno de cancha / Mundialista no oficial",
+        spotifyId: "3u5N55tHf7hXATSQrjBh2q"
+      }
+    ];
+
+    let current = Number(localStorage.getItem('currentSong') || 0);
+    let teams = JSON.parse(localStorage.getItem('teams') || '[{"name":"SON","score":0},{"name":"Rieder","score":0},{"name":"Davies","score":0},{"name":"Pulisic","score":0}]');
+
+    function save(){
+      localStorage.setItem('currentSong', current);
+      localStorage.setItem('teams', JSON.stringify(teams));
+    }
+
+    function renderSong(){
+      const song = songs[current];
+      document.getElementById('roundLabel').textContent = `Ronda ${current + 1} de ${songs.length}`;
+      document.getElementById('spotifyBox').innerHTML = `<iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/${song.spotifyId}?utm_source=generator&theme=0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+      document.getElementById('songTitle').textContent = song.title;
+      document.getElementById('artist').textContent = `Artista: ${song.artist}`;
+      document.getElementById('worldcup').textContent = `Mundial: ${song.worldcup}`;
+      document.getElementById('pointsHelp').textContent = `Respuesta completa sugerida: “${song.title}”, de ${song.artist}, ${song.worldcup}.`;
+      document.getElementById('answerBox').classList.remove('show');
+      document.getElementById('bar').style.width = `${((current + 1) / songs.length) * 100}%`;
+      save();
+    }
+
+    function showAnswer(){document.getElementById('answerBox').classList.add('show')}
+    function nextSong(){current = (current + 1) % songs.length; renderSong()}
+    function shuffleSongs(){
+      for(let i=songs.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [songs[i],songs[j]]=[songs[j],songs[i]];
+      }
+      current=0; renderSong();
+    }
+
+    function renderTeams(){
+      const wrap = document.getElementById('teams');
+      wrap.innerHTML = teams.map((t,i)=>`
+        <div class="team">
+          <div class="teamName">${t.name}</div>
+          <div class="score">${t.score}</div>
+          <div class="scoreBtns">
+            <button onclick="addPoints(${i},1)">+1</button>
+            <button onclick="addPoints(${i},2)">+2</button>
+            <button onclick="addPoints(${i},3)">+3</button>
+            <button class="secondary" onclick="addPoints(${i},-1)">-1</button>
+          </div>
+        </div>
+      `).join('');
+      save();
+    }
+    function addPoints(i,pts){teams[i].score=Math.max(0,teams[i].score+pts);renderTeams()}
+    function addTeam(){
+      const input = document.getElementById('teamInput');
+      const name = input.value.trim();
+      if(!name) return;
+      teams.push({name,score:0});
+      input.value=''; renderTeams();
+    }
+    function resetGame(){
+      if(!confirm('¿Reiniciar canción actual y puntajes?')) return;
+      current=0; teams=teams.map(t=>({...t,score:0})); renderSong(); renderTeams();
+    }
+
+    renderSong();
+    renderTeams();
+  </script>
+</body>
+</html>
